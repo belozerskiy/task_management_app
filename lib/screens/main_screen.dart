@@ -3,7 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_manager_mobile/blocs/task/task_bloc.dart';
 import 'package:task_manager_mobile/blocs/task/task_event.dart';
 import 'package:task_manager_mobile/blocs/task/task_state.dart';
+import 'package:task_manager_mobile/blocs/tasks_search/tasks_search_bloc.dart';
+import 'package:task_manager_mobile/blocs/tasks_search/tasks_search_event.dart';
+import 'package:task_manager_mobile/blocs/tasks_search/tasks_search_state.dart';
 import 'package:task_manager_mobile/screens/create_task_screen.dart';
+import 'package:task_manager_mobile/ui/header.dart';
+import 'package:task_manager_mobile/ui/search_bar.dart';
 import 'package:task_manager_mobile/ui/tasks_list.dart';
 import 'package:task_manager_mobile/ui/tasks_status_filter_bloc.dart';
 
@@ -15,18 +20,7 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Task Management App'),
-        actions: <Widget>[
-          TaskStatusFilterBloc(),
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () => BlocProvider.of<TaskBloc>(context).add(
-              TasksLoaded(reset: true),
-            ),
-          )
-        ],
-      ),
+      appBar: Header(),
       body: Column(
         children: <Widget>[
           Expanded(
