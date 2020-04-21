@@ -5,10 +5,10 @@ abstract class TaskState {}
 class TasksLoadingStart extends TaskState {}
 
 class TasksLoadingSuccess extends TaskState {
-  final List<TaskModel> tasks;
-  final int skip;
-  final int limit;
-  final bool loadMore;
+  List<TaskModel> tasks;
+  int skip;
+  int limit;
+  bool loadMore;
 
   TasksLoadingSuccess({
     this.tasks,
@@ -16,6 +16,14 @@ class TasksLoadingSuccess extends TaskState {
     this.limit,
     this.loadMore,
   });
+
+  TasksLoadingSuccess copyWith({tasks, skip, limit, loadMore}) {
+    return TasksLoadingSuccess()
+      ..tasks = tasks ?? this.tasks
+      ..skip = skip ?? this.skip
+      ..limit = limit ?? this.limit
+      ..loadMore = loadMore ?? this.loadMore;
+  }
 }
 
 class TasksLoadingError extends TaskState {}

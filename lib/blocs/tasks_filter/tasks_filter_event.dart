@@ -1,5 +1,3 @@
-// class TaskFilterEve
-
 import 'package:task_manager_mobile/models/tasks_visibility_filter.dart';
 
 abstract class TasksFilterEvent {}

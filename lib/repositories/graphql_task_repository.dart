@@ -26,6 +26,7 @@ class GraphQLTaskRepository implements AbstractTaskRepository {
         'skip': skip,
         'limit': limit,
       },
+      fetchPolicy: FetchPolicy.cacheAndNetwork,
       pollInterval: 100,
       fetchResults: true,
     );

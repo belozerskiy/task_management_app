@@ -1,11 +1,10 @@
 import 'package:bloc/bloc.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:task_manager_mobile/blocs/task/task_event.dart';
 import 'package:task_manager_mobile/blocs/task/task_state.dart';
 import 'package:task_manager_mobile/models/task_model.dart';
 import 'package:task_manager_mobile/models/task_status.dart';
 import 'package:task_manager_mobile/repositories/graphql_task_repository.dart';
-
-import 'package:rxdart/rxdart.dart';
 
 class TaskBloc extends Bloc<TaskEvent, TaskState> {
   GraphQLTaskRepository taskRepository;
@@ -100,13 +99,17 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       id: event.task.id,
       status: TaskStatusHelper(event.status).stringStatus,
     );
-    // Replace old task
-    final tasks = (state as TasksLoadingSuccess)
-        .tasks
-        .map((task) => task.id == updatedTask.id ? updatedTask : task)
-        .toList();
 
-    yield TasksLoadingSuccess(tasks: tasks);
+    if (updatedTask != null) {
+      final prevState = (state as TasksLoadingSuccess);
+
+      // Replace old task
+      final tasks = prevState.tasks
+          .map((task) => task.id == updatedTask.id ? updatedTask : task)
+          .toList();
+
+      yield prevState.copyWith(tasks: tasks);
+    }
   }
 
   Stream<TaskState> _mapTaskDeletedEventToState(TaskDeleted event) async* {
@@ -116,22 +119,18 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       final prevState = (state as TasksLoadingSuccess);
       final tasks =
           prevState.tasks.where((task) => task.id != deletedTask.id).toList();
-
-      yield TasksLoadingSuccess(
-        tasks: tasks,
-        skip: prevState.skip,
-        limit: prevState.limit,
-        loadMore: prevState.loadMore,
-      );
+      yield prevState.copyWith(tasks: tasks);
     }
   }
 
   Stream<TaskState> _mapTaskAddedEventToState(TaskAdded event) async* {
     final createdTask = await taskRepository.createTask(
         title: event.title, description: event.description);
+
     if (createdTask != null) {
+      final prevState = (state as TasksLoadingSuccess);
       final tasks = (state as TasksLoadingSuccess).tasks;
-      yield TasksLoadingSuccess(tasks: [createdTask, ...tasks]);
+      yield prevState.copyWith(tasks: [createdTask, ...tasks]);
     }
   }
 }
