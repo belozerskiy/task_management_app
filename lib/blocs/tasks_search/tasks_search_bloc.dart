@@ -47,6 +47,6 @@ class TasksSearchBloc extends Bloc<TasksSearchEvent, TasksSearchState> {
 
   Stream<TasksSearchState> _mapSearchHiddedToState(event) async* {
     yield TasksSearchHiding();
-    taskBloc.add(TasksLoaded());
+    taskBloc.add(TasksLoaded(reset: true));
   }
 }

@@ -48,45 +48,36 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
 
   Stream<TaskState> _mapTaskLoadedEventToState(TasksLoaded event) async* {
     try {
-      final limit = 15;
+      int limit = 15;
+      int skip = 0;
+      List<TaskModel> tasks = [];
 
       if (event.reset) {
+        skip = 0;
         yield TasksLoadingStart();
-
-        List<TaskModel> tasks = await taskRepository.getTasks(
-          search: event.search,
-          status: event.status,
-          skip: 0,
-          limit: limit,
-        );
-
-        yield TasksLoadingSuccess(
-          tasks: tasks,
-          skip: 0,
-          limit: limit,
-          loadMore: tasks.length >= limit,
-        );
       } else if (state is TasksLoadingSuccess) {
         final prevState = (state as TasksLoadingSuccess);
+        tasks = prevState.tasks;
 
         if (prevState.loadMore) {
-          final skip = limit + prevState.skip;
+          skip = limit + prevState.skip;
+        }
+      }
 
-          List<TaskModel> tasks = await taskRepository.getTasks(
+      tasks = tasks +
+          await taskRepository.getTasks(
             search: event.search,
             status: event.status,
             skip: skip,
             limit: limit,
           );
 
-          yield TasksLoadingSuccess(
-            tasks: prevState.tasks + tasks,
-            skip: skip,
-            limit: limit,
-            loadMore: tasks.length >= limit,
-          );
-        }
-      }
+      yield TasksLoadingSuccess(
+        tasks: tasks,
+        skip: skip,
+        limit: limit,
+        loadMore: tasks.length >= limit,
+      );
     } catch (e) {
       yield TasksLoadingError();
     }
